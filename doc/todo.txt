@@ -1,0 +1,133 @@
+In order of importance:
+	Fix move with only updating coordinate
+	Why *creature.Creature pointer???
+	Creature X and Y is illogical
+	Should [][]terrain.Terrain also be a map[Coord]Terrain as a.Objects?
+	Switch(?) to sdl with font image as sprite instead for increased OS support
+	Since a.Objects is a map, not the same order of characters take their turn. Wanted "feature"?
+	Map from file - human readable - preferably
+	make preferences and keybindings config files
+	Implement more complex time system
+	Fix opening door animation
+	Walking into a door and not opening it still ends your turn
+	Solve a or an discussion
+
+Links
+=====
+http://roguebasin.roguelikedevelopment.org/index.php?title=How_to_Write_a_Roguelike_in_15_Steps
+
+http://roguebasin.roguelikedevelopment.org/index.php?title=Articles
+http://roguebasin.roguelikedevelopment.org/index.php?title=Roguelike_Dev_FAQ
+
+http://roguebasin.roguelikedevelopment.org/index.php?title=Save_Files
+
+Notes
+=====
+Explicitly ask for feedback
+Add mail address
+Add github link
+
+Unit movement
+Narrated action
+
+Design
+======
+Random world generation to some degree?
+Permadeath
+Freedom
+Turn-based?
+
+Progress
+========
+
+100% - Step 1 - Decide to write a game
+100% - Step 2 - Hello world!
+100% - Step 3 - It's a boy!
+100% - Step 4 - The map
+80% - Step 5 - Saving/Loading
+80% - Step 6 - It's alive! Alive!
+0% - Step 7 - Interaction
+0% - Step 8 - Data files
+0% - Step 9 - Items
+0% - Step 10 - Magic
+0% - Step 11 - Simple game
+0% - Step 12 - Levels
+0% - Step 13 - Experience
+0% - Step 14 - Citizens
+0% - Step 15 - Free at last
+
+This is a rough route map for the creators of roguelikes. I'm well aware that there are many possible routes and that no two journeys are the same -- this is a description of one of possibilities and maybe will help you to plan your own.
+
+    Step 5 - Saving/Loading
+    Step 6 - It's alive! Alive!
+    Step 7 - Interaction
+    Step 8 - Data files
+    Step 9 - Items
+    Step 10 - Magic
+    Step 11 - Simple game
+    Step 12 - Levels
+    Step 13 - Experience
+    Step 14 - Citizens
+    Step 15 - Free at last
+
+
+Step 7 - Interaction
+====================
+
+Add stats for your creatures. A simplification of the ones you envisioned, probably. It's best to add stats as they are needed, not because they 'look cool', but you might not be able to resist ;).
+
+Make the creatures notice each other -- bump, attack, etc. Gradually improve their AIs, so that they can chase the player.
+
+Implement and test the combat system -- without equipment for now, just hardcode the values. Do lots of testing.
+
+Step 8 - Data files
+===================
+
+Move the creature, map features, etc. definitions to data files. Forget about scripting for now If something cannot be moved -- just leave it for now.
+
+Step 9 - Items
+==============
+
+Add items. For start, just objects you can pick up -- no properties. Gradually give them properties, kinds, stats, etc., implement inventory, picking up and dropping, equipping and using (no effects yet), also stacking, containers (if you want them), etc.
+
+This step usually requires lots of testing to balance.
+
+Step 10 - Magic
+===============
+
+Add item effects, special monster attacks, spells. Add items and monsters to test them. You don't need all the possible effects right away, just the ones that are needed for the next step.
+
+Step 11 - Simple game
+=====================
+
+Try to make a simple, hard-coded game. Play it and give it to your friends. Test the mechanics you've implemented so far. See if the game is fun.
+
+Change everything you need to change. Don't forget to test a lot. Always ask someone to test the game's 'fun factor', or test it yourself after a while; it's hard to notice some things right away.
+
+This step should take a pretty long time, until you've got a playable, fun mini-game.
+
+Step 12 - Levels
+================
+
+Write your level generators. Implement moving between the levels, a wilderness and/or town if you want them, saving the levels on level change if you want them to be persistent (so that they don't take up memory).
+
+Spread your monsters and items on different depths. Add more monsters and items, with their effects, as needed.
+
+Step 13 - Experience
+====================
+
+Start developing your experience system and skill system. Tune the monsters' and items' stats. Make character generation screen, classes, races, and whatever else you need.
+
+Playtest your game frequently.
+
+Step 14 - Citizens
+==================
+
+Add NPCs, shopkeepers, and simple quests if you need them. Keep adding features and tuning the stats.
+
+Step 15 - Free at last
+======================
+
+Start adding and testing all the 'unique' features you thought were so cool months (years?) ago, when you started the whole thing. Revise your opinions of them and see if they fit the game.
+
+Write your pet random plot generator, factions system, infinite wilderness generator, neural network AI, or other unique feature, since you can now test it in a working game.

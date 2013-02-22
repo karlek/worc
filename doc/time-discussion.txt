@@ -1,0 +1,20 @@
+Time:
+	Time tick is 0.1s long.
+	Increased perception means you need less ticks to resume your turn
+	When turn is used your "tick counter" is zeroed.
+	When it's "full" again, you can act again.
+
+Ex:
+Gobbal (needs 1.0)
+You (needs 0,5)
+0.1 Gobbal (0.1), you (0.1)
+0.2 Gobbal (0.2), you (0.2)
+0.3 Gobbal (0.3), you (0.3)
+0.4 Gobbal (0.4), you (0.4)
+0.5 Gobbal (0.5), You act (0)
+0.6 Gobbal (0.6), you (0.1)
+0.7 Gobbal (0.7), you (0.2)
+0.8 Gobbal (0.8), you (0.3)
+0.9 Gobbal (0.9), you (0.4)
+1.0 Gobbal Act (0), you Act (0)
+
