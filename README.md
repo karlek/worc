@@ -1,7 +1,7 @@
 Worc
 ====
 
-Worc is a tribute to an old World of Warcraft movie called ["World of roguecraft"](http://www.roguecraft.com/episode1.html).
+Worc is named after an old World of Warcraft movie called ["World of roguecraft"](http://www.roguecraft.com/episode1.html).
 Worc is a roguelike engine for golang.
 
 API documentation
