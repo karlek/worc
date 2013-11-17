@@ -2,8 +2,8 @@
 package draw
 
 import (
-	"github.com/karlek/torc/coord"
-	"github.com/karlek/torc/screen"
+	"github.com/karlek/worc/coord"
+	"github.com/karlek/worc/screen"
 	"github.com/nsf/termbox-go"
 )
 

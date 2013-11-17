@@ -7,12 +7,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/karlek/torc/area"
-	"github.com/karlek/torc/coord"
-	"github.com/karlek/torc/draw"
-	"github.com/karlek/torc/menu"
-	"github.com/karlek/torc/object"
-	"github.com/karlek/torc/screen"
+	"github.com/karlek/worc/area"
+	"github.com/karlek/worc/coord"
+	"github.com/karlek/worc/draw"
+	"github.com/karlek/worc/menu"
+	"github.com/karlek/worc/object"
+	"github.com/karlek/worc/screen"
 	"github.com/mewkiz/pkg/errutil"
 	"github.com/nsf/termbox-go"
 )

@@ -2,10 +2,10 @@
 package area
 
 import (
-	"github.com/karlek/torc/coord"
-	"github.com/karlek/torc/draw"
-	"github.com/karlek/torc/object"
-	"github.com/karlek/torc/screen"
+	"github.com/karlek/worc/coord"
+	"github.com/karlek/worc/draw"
+	"github.com/karlek/worc/object"
+	"github.com/karlek/worc/screen"
 	"github.com/nsf/termbox-go"
 )
 
