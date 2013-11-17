@@ -1,19 +1,17 @@
+///
 package menu
 
-import "github.com/nsf/termbox-go"
+import (
+	"github.com/nsf/termbox-go"
+)
 
-var statusMesg []string
-var statusWidth int
+var (
+	statusMesg  []string
+	statusWidth int
 
-var statusX int
-var statusY int
-
-type AreaScreen struct {
-	Width   int
-	Height  int
-	XOffset int
-	YOffset int
-}
+	statusX int
+	statusY int
+)
 
 // Set number of status messages to be shown
 func SetStatusSize(width, height int) {
@@ -43,7 +41,6 @@ func print(str string, x, y, width int, fg termbox.Attribute, bg termbox.Attribu
 /// Breaks on very long strings
 // Writes string to status buffer
 func PrintStatus(str string) {
-
 	statusLen := len(statusMesg)
 
 	var strs []string
