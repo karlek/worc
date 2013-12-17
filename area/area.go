@@ -1,137 +1,212 @@
-// Package area implements functions for moving objects over a 2d plane.
+// Package area implements functions to draw and move moveable objects around
+// in an area.
 package area
 
 import (
 	"github.com/karlek/worc/coord"
 	"github.com/karlek/worc/draw"
-	"github.com/karlek/worc/object"
 	"github.com/karlek/worc/screen"
-	"github.com/nsf/termbox-go"
 )
-
-// Walkable are drawable and can answer the question if an object can be placed
-// on top of it.
-type Walkable interface {
-	draw.Drawable
-	IsWalkable() bool
-}
 
 // Area is a collection of terrain and objects placed on top of it.
 type Area struct {
-	Terrain       [][]Walkable
-	Objects       map[coord.Coord]Stack
+	Terrain       [][]Stackable
+	Items         map[coord.Coord]*Stack
+	Objects       map[coord.Coord]Stackable
+	Monsters      map[coord.Coord]Moveable
 	Width, Height int
-}
-
-type Stack []Walkable
-
-func (s Stack) push(d Walkable) {
-	s = append(s, d)
-}
-
-func (s Stack) pop() Walkable {
-	if len(s) == 0 {
-		return nil
-	}
-	tmp := s[len(s)-1]
-	s = s[:len(s)-1]
-	return tmp
+	Screen        screen.Screen
 }
 
 // New initalizes a new area.
-func New(width, height int) *Area {
+func New(width, height int, scr screen.Screen) *Area {
 	a := Area{
-		Terrain: make([][]Walkable, width),
-		Objects: make(map[coord.Coord]Stack),
-		Width:   width,
-		Height:  height,
+		Terrain:  make([][]Stackable, width),
+		Items:    make(map[coord.Coord]*Stack),
+		Objects:  make(map[coord.Coord]Stackable),
+		Monsters: make(map[coord.Coord]Moveable),
+		Width:    width,
+		Height:   height,
+		Screen:   scr,
 	}
 
 	for x := 0; x < width; x++ {
-		a.Terrain[x] = make([]Walkable, height)
+		a.Terrain[x] = make([]Stackable, height)
 	}
 	return &a
 }
 
-/// Make DrawTerrain, DrawObjects, Draw
-// Draw draws the terrain of the area to screen.AreaScreen.
-func (a *Area) Draw() {
-	for x := 0; x < screen.AreaScreen.Width; x++ {
-		for y := 0; y < screen.AreaScreen.Height; y++ {
-			// c := coord.Coord(x+screen.AreaScreen.XOffset, y+screen.AreaScreen.YOffset)
-			// _, ok := a.Objects[c]
-			// if ok {
-			// 	o := a.Objects[c].pop()
-			// 	if o == nil {
-			// 		// draw terrain
-			// 	}
-			// }
-			// terr := a.Terrain[x+screen.Screen.YOffset][y+screen.Screen.YOffset]
-			// log.Fatal(len(a.Terrain), len(a.Terrain[x]))
-			terr := a.Terrain[x][y]
-			termbox.SetCell(x, y, terr.Graphic().Ch, terr.Graphic().Fg, terr.Graphic().Bg)
+// DrawTerrain draws the terrain of the area to screen.
+func (a *Area) DrawTerrain() {
+	for x := 0; x < a.Screen.Width; x++ {
+		for y := 0; y < a.Screen.Height; y++ {
+			draw.DrawXY(x, y, a.Terrain[x][y], a.Screen)
 		}
 	}
-	termbox.Flush()
 }
 
-// MoveUp moves the object 1 tile upwards if possible.
-func (a *Area) MoveUp(o *object.Object) error {
-	return a.SetObjectXY(o, o.X, o.Y-1)
+// DrawObjects draws all objects in an area to the screen.
+func (a Area) DrawObjects() {
+	for c, s := range a.Objects {
+		if s == nil {
+			continue
+		}
+		draw.DrawXY(c.X, c.Y, s, a.Screen)
+	}
 }
 
-///
-func (a *Area) MoveDown(o *object.Object) error {
-	return a.SetObjectXY(o, o.X, o.Y+1)
+// DrawItems draws all items in an area to the screen.
+func (a Area) DrawItems() {
+	for c, s := range a.Items {
+		w := s.Peek()
+		if w == nil {
+			continue
+		}
+		draw.DrawXY(c.X, c.Y, w, a.Screen)
+	}
 }
 
-///
-func (a *Area) MoveRight(o *object.Object) error {
-	return a.SetObjectXY(o, o.X+1, o.Y)
+// DrawMonsters draws all monsters in an area to the screen.
+func (a Area) DrawMonsters() {
+	for c, m := range a.Monsters {
+		if m == nil {
+			continue
+		}
+		draw.DrawXY(c.X, c.Y, m, a.Screen)
+	}
 }
 
-///
-func (a *Area) MoveLeft(o *object.Object) error {
-	return a.SetObjectXY(o, o.X-1, o.Y)
-}
-
-/// should return err on not exists?
-///
-func (a *Area) SetObjectXY(o *object.Object, x, y int) error {
+func (a Area) ReDraw(x, y int) {
 	c := coord.Coord{x, y}
 	p := coord.Plane{a.Width, a.Height}
-	if !p.Exists(c) {
-		// return errutil.NewNoPosf("(%d, %d) doesn't exist on that area.", x, y)
+	if !p.Contains(c) {
+		return
+	}
+
+	if m := a.Monsters[c]; m != nil {
+		draw.DrawXY(x, y, m, a.Screen)
+		return
+	}
+	if w := a.Objects[c]; w != nil {
+		draw.DrawXY(x, y, w, a.Screen)
+		return
+	}
+	if i := a.Items[c].Peek(); i != nil {
+		draw.DrawXY(x, y, i, a.Screen)
+		return
+	}
+	draw.DrawXY(x, y, a.Terrain[x][y], a.Screen)
+}
+
+// Draw is a convenience function which draws both terrain and objects to the
+// screen, in that order.
+func (a Area) Draw() {
+	a.DrawTerrain()
+	a.DrawObjects()
+	a.DrawItems()
+	a.DrawMonsters()
+}
+
+// MoveUp moves a moveable object 1 tile upwards, if possible. Otherwise
+// it returns the colliding object.
+func (a *Area) MoveUp(m Moveable) *Collision {
+	return a.SetObjectXY(m, m.X(), m.Y()-1)
+}
+
+// MoveDown moves a moveable object 1 tile downwards, if possible. Otherwise
+// it returns the colliding object.
+func (a *Area) MoveDown(m Moveable) *Collision {
+	return a.SetObjectXY(m, m.X(), m.Y()+1)
+}
+
+// MoveRight moves a moveable object 1 tile rightwards, if possible. Otherwise
+// it returns the colliding object.
+func (a *Area) MoveRight(m Moveable) *Collision {
+	return a.SetObjectXY(m, m.X()+1, m.Y())
+}
+
+// MoveLeft moves a moveable object 1 tile leftwards, if possible. Otherwise
+// it returns the colliding object.
+func (a *Area) MoveLeft(m Moveable) *Collision {
+	return a.SetObjectXY(m, m.X()-1, m.Y())
+}
+
+type Collision struct {
+	S Stackable
+	X int
+	Y int
+}
+
+func (a Area) IsXYStackable(x, y int) bool {
+	c := coord.Coord{x, y}
+	p := coord.Plane{a.Width, a.Height}
+	if !p.Contains(c) {
+		return false
+	}
+
+	// remove the object from the old position, add to the new position and
+	// update both positions.
+	if !a.Terrain[x][y].IsStackable() {
+		return false
+	}
+
+	// test if an non-stackable object is already on that location.
+	if mob := a.Monsters[c]; mob != nil {
+		if !mob.IsStackable() {
+			return false
+		}
+	}
+	return true
+}
+
+// SetObjectXY sets an objects x and y value.
+func (a *Area) SetObjectXY(m Moveable, x, y int) *Collision {
+	c := coord.Coord{x, y}
+	p := coord.Plane{a.Width, a.Height}
+	if !p.Contains(c) {
 		return nil
 	}
 
 	// remove the object from the old position, add to the new position and
 	// update both positions.
-	if !a.Terrain[x][y].IsWalkable() {
-		return MovementError{
-			X: x,
-			Y: y,
+	if !a.Terrain[x][y].IsStackable() {
+		return &Collision{a.Terrain[x][y], x, y}
+	}
+
+	// test if an non-stackable object is already on that location.
+	if mob := a.Monsters[c]; mob != nil {
+		if !mob.IsStackable() {
+			return &Collision{mob, x, y}
 		}
 	}
+
 	// Update old position.
-	a.Objects[coord.Coord{o.X, o.Y}].pop()
-	draw.DrawXY(o.X, o.Y, a.Terrain[o.X][o.Y], screen.AreaScreen)
+	c = coord.Coord{m.X(), m.Y()}
+	if a.Monsters[c] != nil {
+		a.Monsters[c] = nil
+	}
+
+	// Object beneath the current object.
+	a.ReDraw(m.X(), m.Y())
 
 	// Update new position.
-	o.X, o.Y = x, y
-	a.Objects[c].push(o)
-	draw.DrawXY(o.X, o.Y, o, screen.AreaScreen)
+	m.NewX(x)
+	m.NewY(y)
+
+	c = coord.Coord{m.X(), m.Y()}
+	a.Monsters[c] = m
+
+	// Redraw need coordinate.
+	a.ReDraw(m.X(), m.Y())
 
 	return nil
 }
 
-// The error type if the unit can't move to the new coordinate
-type MovementError struct {
-	X int
-	Y int
-}
-
-// Error message.
-func (me MovementError) Error() string {
-	return "couldn't move creature, path is blocked"
+// Moveable asserts that the object can be moved.
+type Moveable interface {
+	X() int
+	Y() int
+	NewX(int)
+	NewY(int)
+	Stackable
 }
