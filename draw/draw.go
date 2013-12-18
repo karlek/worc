@@ -18,10 +18,9 @@ func DrawXY(x, y int, d Drawable, scr screen.Screen) {
 	// Since the screen isn't always located at (0, 0) we have to take
 	// the offsets into account.
 	c := coord.Coord{x + scr.XOffset, y + scr.YOffset}
-	p := coord.Plane{scr.Width, scr.Height}
+	p := coord.Plane{scr.Width + scr.XOffset, scr.Height + scr.YOffset, scr.XOffset, scr.YOffset}
 	if !p.Contains(c) {
 		return
 	}
-	termbox.SetCell(x, y, d.Graphic().Ch, d.Graphic().Fg, d.Graphic().Bg)
-	termbox.Flush()
+	termbox.SetCell(x+scr.XOffset, y+scr.YOffset, d.Graphic().Ch, d.Graphic().Fg, d.Graphic().Bg)
 }
