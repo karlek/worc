@@ -4,18 +4,18 @@ import (
 	"github.com/karlek/worc/draw"
 )
 
-// Stackable are objects which can be drawn and answer the question if another
+// Pathable are objects which can be drawn and answer the question if another
 // object can be placed on top of it in the stack.
-type Stackable interface {
+type Pathable interface {
 	draw.Drawable
-	IsStackable() bool
+	IsPathable() bool
 }
 
 // Stack is a pile of stuff which can be walked upon or not walked upon.
-type Stack []Stackable
+type Stack []Pathable
 
 // Peek returns the top most object of the stack without removing it.
-func (s *Stack) Peek() Stackable {
+func (s *Stack) Peek() Pathable {
 	if s == nil {
 		return nil
 	}
@@ -26,12 +26,12 @@ func (s *Stack) Peek() Stackable {
 }
 
 // Push adds a value ontop of the stack.
-func (s *Stack) Push(d Stackable) {
+func (s *Stack) Push(d Pathable) {
 	*s = append(*s, d)
 }
 
 // PopSecond returns the second value from the top.
-func (s *Stack) PopSecond() Stackable {
+func (s *Stack) PopSecond() Pathable {
 	if len(*s) < 2 {
 		return nil
 	}
@@ -43,7 +43,7 @@ func (s *Stack) PopSecond() Stackable {
 }
 
 // Pop returns the latest value.
-func (s *Stack) Pop() Stackable {
+func (s *Stack) Pop() Pathable {
 	if len(*s) == 0 {
 		return nil
 	}

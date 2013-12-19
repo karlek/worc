@@ -10,13 +10,13 @@ import (
 type Area struct {
 	Terrain       [][]Tile
 	Items         map[coord.Coord]*Stack
-	Objects       map[coord.Coord]Stackable
+	Objects       map[coord.Coord]Pathable
 	Monsters      map[coord.Coord]Moveable
 	Width, Height int
 }
 
 type Tile interface {
-	Stackable
+	Pathable
 	IsBlockingLineOfSight() bool
 	IsExplored() bool
 	SetExplored(bool)
@@ -27,7 +27,7 @@ func New(width, height int) *Area {
 	a := Area{
 		Terrain:  make([][]Tile, width),
 		Items:    make(map[coord.Coord]*Stack),
-		Objects:  make(map[coord.Coord]Stackable),
+		Objects:  make(map[coord.Coord]Pathable),
 		Monsters: make(map[coord.Coord]Moveable),
 		Width:    width,
 		Height:   height,
@@ -64,7 +64,7 @@ func (a *Area) MoveLeft(m Moveable) *Collision {
 }
 
 type Collision struct {
-	S Stackable
+	S Pathable
 	X int
 	Y int
 }
@@ -75,21 +75,21 @@ func (a Area) ExistsXY(x, y int) bool {
 	return p.Contains(c)
 }
 
-func (a Area) IsXYStackable(x, y int) bool {
+func (a Area) IsXYPathable(x, y int) bool {
 	if !a.ExistsXY(x, y) {
 		return false
 	}
 
 	// remove the object from the old position, add to the new position and
 	// update both positions.
-	if !a.Terrain[x][y].IsStackable() {
+	if !a.Terrain[x][y].IsPathable() {
 		return false
 	}
 
 	c := coord.Coord{x, y}
-	// test if an non-stackable object is already on that location.
+	// test if an non-Pathable object is already on that location.
 	if mob := a.Monsters[c]; mob != nil {
-		if !mob.IsStackable() {
+		if !mob.IsPathable() {
 			return false
 		}
 	}
@@ -106,13 +106,13 @@ func (a *Area) SetObjectXY(m Moveable, x, y int) *Collision {
 
 	// remove the object from the old position, add to the new position and
 	// update both positions.
-	if !a.Terrain[x][y].IsStackable() {
+	if !a.Terrain[x][y].IsPathable() {
 		return &Collision{a.Terrain[x][y], x, y}
 	}
 
-	// test if an non-stackable object is already on that location.
+	// test if an non-Pathable object is already on that location.
 	if mob := a.Monsters[c]; mob != nil {
-		if !mob.IsStackable() {
+		if !mob.IsPathable() {
 			return &Collision{mob, x, y}
 		}
 	}
@@ -139,5 +139,5 @@ type Moveable interface {
 	Y() int
 	NewX(int)
 	NewY(int)
-	Stackable
+	Pathable
 }

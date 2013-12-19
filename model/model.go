@@ -7,10 +7,10 @@ import (
 
 // Model is something that is drawed on AreaScreen ontop of an area.
 type Model struct {
-	Xval      int          // X is x coordinate.
-	Yval      int          // Y is y coordinate.
-	G         termbox.Cell // G is graphics.
-	Stackable bool         // Stackable is a boolean flag if other objects can be placed on top of this model.
+	Xval     int          // X is x coordinate.
+	Yval     int          // Y is y coordinate.
+	G        termbox.Cell // G is graphics.
+	Pathable bool         // Pathable is a boolean flag if other objects can be placed on top of this model.
 }
 
 // Graphic is needed for draw.Drawable.
@@ -18,9 +18,9 @@ func (m Model) Graphic() termbox.Cell {
 	return m.G
 }
 
-// IsStackable is needed for area.Stackable.
-func (m Model) IsStackable() bool {
-	return m.Stackable
+// IsPathable is needed for area.Pathable.
+func (m Model) IsPathable() bool {
+	return m.Pathable
 }
 
 // X returns the x value of the current coordinate.
