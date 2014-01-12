@@ -4,6 +4,7 @@ package area
 
 import (
 	"github.com/karlek/worc/coord"
+	"github.com/mewkiz/pkg/errutil"
 )
 
 // Area is a collection of terrain and objects placed on top of it.
@@ -41,32 +42,26 @@ func New(width, height int) *Area {
 
 // MoveUp moves a moveable object 1 tile upwards, if possible. Otherwise
 // it returns the colliding object.
-func (a *Area) MoveUp(m Moveable) *Collision {
+func (a *Area) MoveUp(m Moveable) (*Collision, error) {
 	return a.SetObjectXY(m, m.X(), m.Y()-1)
 }
 
 // MoveDown moves a moveable object 1 tile downwards, if possible. Otherwise
 // it returns the colliding object.
-func (a *Area) MoveDown(m Moveable) *Collision {
+func (a *Area) MoveDown(m Moveable) (*Collision, error) {
 	return a.SetObjectXY(m, m.X(), m.Y()+1)
 }
 
 // MoveRight moves a moveable object 1 tile rightwards, if possible. Otherwise
 // it returns the colliding object.
-func (a *Area) MoveRight(m Moveable) *Collision {
+func (a *Area) MoveRight(m Moveable) (*Collision, error) {
 	return a.SetObjectXY(m, m.X()+1, m.Y())
 }
 
 // MoveLeft moves a moveable object 1 tile leftwards, if possible. Otherwise
 // it returns the colliding object.
-func (a *Area) MoveLeft(m Moveable) *Collision {
+func (a *Area) MoveLeft(m Moveable) (*Collision, error) {
 	return a.SetObjectXY(m, m.X()-1, m.Y())
-}
-
-type Collision struct {
-	S Pathable
-	X int
-	Y int
 }
 
 func (a Area) ExistsXY(x, y int) bool {
@@ -96,24 +91,30 @@ func (a Area) IsXYPathable(x, y int) bool {
 	return true
 }
 
+type Collision struct {
+	S Pathable
+	X int
+	Y int
+}
+
 // SetObjectXY sets an objects x and y value.
-func (a *Area) SetObjectXY(m Moveable, x, y int) *Collision {
+func (a *Area) SetObjectXY(m Moveable, x, y int) (col *Collision, err error) {
 	c := coord.Coord{x, y}
 	p := coord.Plane{a.Width, a.Height, 0, 0}
 	if !p.Contains(c) {
-		return nil
+		return nil, errutil.Newf("out of bounds.")
 	}
 
 	// remove the object from the old position, add to the new position and
 	// update both positions.
 	if !a.Terrain[x][y].IsPathable() {
-		return &Collision{a.Terrain[x][y], x, y}
+		return &Collision{a.Terrain[x][y], x, y}, nil
 	}
 
 	// test if an non-Pathable object is already on that location.
 	if mob := a.Monsters[c]; mob != nil {
 		if !mob.IsPathable() {
-			return &Collision{mob, x, y}
+			return &Collision{mob, x, y}, nil
 		}
 	}
 
@@ -130,7 +131,7 @@ func (a *Area) SetObjectXY(m Moveable, x, y int) *Collision {
 	c = coord.Coord{m.X(), m.Y()}
 	a.Monsters[c] = m
 
-	return nil
+	return nil, nil
 }
 
 // Moveable asserts that the object can be moved.

@@ -5,8 +5,19 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
+type Modelable interface {
+	X() int
+	Y() int
+	NewX(int)
+	NewY(int)
+	SetGraphics(termbox.Cell)
+	SetPathable(bool)
+	IsPathable() bool
+}
+
 // Model is something that is drawed on AreaScreen ontop of an area.
 type Model struct {
+	Modelable
 	Xval     int          // X is x coordinate.
 	Yval     int          // Y is y coordinate.
 	G        termbox.Cell // G is graphics.
@@ -41,4 +52,14 @@ func (m *Model) NewX(x int) {
 // NewY sets a new y value for the coordinate.
 func (m *Model) NewY(y int) {
 	m.Yval = y
+}
+
+// SetGraphics sets graphics for the model.
+func (m *Model) SetGraphics(g termbox.Cell) {
+	m.G = g
+}
+
+// SetPathable sets pathability for the model.
+func (m *Model) SetPathable(pathable bool) {
+	m.Pathable = pathable
 }
