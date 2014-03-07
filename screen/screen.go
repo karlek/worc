@@ -3,8 +3,9 @@ package screen
 
 // Screen is a part of the user interface to be drawn upon.
 type Screen struct {
-	Width   int
-	Height  int
+	Width  int
+	Height int
+	// embedded image.Point
 	XOffset int
 	YOffset int
 }

@@ -2,22 +2,21 @@
 package model
 
 import (
+	"github.com/karlek/worc/coord"
+
 	"github.com/nsf/termbox-go"
 )
 
-type Modelable interface {
+type Modeler interface {
 	X() int
 	Y() int
-	NewX(int)
-	NewY(int)
+	SetX(int)
+	SetY(int)
 	SetGraphics(termbox.Cell)
-	SetPathable(bool)
-	IsPathable() bool
 }
 
 // Model is something that is drawed on AreaScreen ontop of an area.
 type Model struct {
-	Modelable
 	Xval     int          // X is x coordinate.
 	Yval     int          // Y is y coordinate.
 	G        termbox.Cell // G is graphics.
@@ -44,13 +43,18 @@ func (m Model) Y() int {
 	return m.Yval
 }
 
-// NewX sets a new x value for the coordinate.
-func (m *Model) NewX(x int) {
+// Coord returns the coordinate.
+func (m Model) Coord() coord.Coord {
+	return coord.Coord{m.X(), m.Y()}
+}
+
+// SetX sets a new x value for the coordinate.
+func (m *Model) SetX(x int) {
 	m.Xval = x
 }
 
-// NewY sets a new y value for the coordinate.
-func (m *Model) NewY(y int) {
+// SetY sets a new y value for the coordinate.
+func (m *Model) SetY(y int) {
 	m.Yval = y
 }
 

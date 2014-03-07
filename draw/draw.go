@@ -12,8 +12,8 @@ type Drawable interface {
 	Graphic() termbox.Cell
 }
 
-// DrawXY draws a drawable object to the screen.
-func DrawXY(x, y int, d Drawable, scr screen.Screen) {
+// DrawCell draws a drawable object to the screen.
+func DrawCell(x, y int, d Drawable, scr screen.Screen) {
 	// Check if the coordinate exists on the plane.
 	// Since the screen isn't always located at (0, 0) we have to take
 	// the offsets into account.
