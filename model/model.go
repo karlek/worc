@@ -12,11 +12,13 @@ type Modeler interface {
 	Y() int
 	SetX(int)
 	SetY(int)
+	Coord() coord.Coord
 	SetGraphics(termbox.Cell)
 }
 
 // Model is something that is drawed on AreaScreen ontop of an area.
 type Model struct {
+	Modeler
 	Xval     int          // X is x coordinate.
 	Yval     int          // Y is y coordinate.
 	G        termbox.Cell // G is graphics.
@@ -48,14 +50,19 @@ func (m Model) Coord() coord.Coord {
 	return coord.Coord{m.X(), m.Y()}
 }
 
-// SetX sets a new x value for the coordinate.
+// SetX sets x to the specified coordinate.
 func (m *Model) SetX(x int) {
 	m.Xval = x
 }
 
-// SetY sets a new y value for the coordinate.
+// SetY sets y to the specified coordinate.
 func (m *Model) SetY(y int) {
 	m.Yval = y
+}
+
+// Coord returns the coordinate of m.
+func (m Model) Coord() coord.Coord {
+	return coord.Coord{m.X(), m.Y()}
 }
 
 // SetGraphics sets graphics for the model.
