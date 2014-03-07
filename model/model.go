@@ -60,11 +60,6 @@ func (m *Model) SetY(y int) {
 	m.Yval = y
 }
 
-// Coord returns the coordinate of m.
-func (m Model) Coord() coord.Coord {
-	return coord.Coord{m.X(), m.Y()}
-}
-
 // SetGraphics sets graphics for the model.
 func (m *Model) SetGraphics(g termbox.Cell) {
 	m.G = g
